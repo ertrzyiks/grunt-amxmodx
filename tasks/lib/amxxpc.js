@@ -20,7 +20,7 @@ amxxpc.CompilationWarning.prototype.toString = function(){
 }
 
 amxxpc.compile = function( src, done ){
-    var amxxpcPath = path.join(__dirname, "../../", "bin/build/packages/base/addons/amxmodx/scripting");
+    var amxxpcPath = path.join(__dirname, "../../", "bin/addons/amxmodx/scripting");
     var sourcePath = path.resolve(src);
     var proc = spawn("./amxxpc", [ sourcePath ], { cwd: amxxpcPath });
     var errors = [];

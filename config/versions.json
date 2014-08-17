@@ -1,0 +1,12 @@
+{
+    "defaultVersion": "1.8.2",
+    "versions":{
+        "1.8.2":{
+            "linux": "http://sourcemod.gameconnect.net/files/amxmodx-1.8.2-base-linux.tar.gz"
+        },
+        
+        "1.8.1": {
+            "linux": "http://sourceforge.net/projects/amxmodx/files/AMX%20Mod%20X%20Base/1.8.1/amxmodx-1.8.1-base.tar.gz/download"
+        }
+    }
+}

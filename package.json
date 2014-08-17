@@ -24,11 +24,15 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt test",
-    "preinstall": "chmod -R 0777 ./scripts && mkdir bin && cd bin && ../scripts/install.sh"
+    "test": "grunt test"
+  },
+  "bin": {
+    "amxx-install": "./amxx-install.js"
   },
   "dependencies": {
-    "async": "latest"
+    "cli-color": "latest",
+    "async": "latest",
+    "http-request": "latest"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.9.2",
