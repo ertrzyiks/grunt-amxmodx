@@ -33,6 +33,7 @@ module.exports = function(grunt) {
         });
         
         async.each(src, function( filepath, next ){
+            grunt.log.writeln('Compile file: ' + filepath);
             amxxpc.compile(filepath, next);
         }, function(err){
             done(err);
