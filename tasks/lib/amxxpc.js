@@ -19,8 +19,8 @@ amxxpc.CompilationWarning.prototype.toString = function(){
     return this.message;
 }
 
-amxxpc.compile = function( src, done ){
-    var amxxpcPath = path.join(__dirname, "../../", "bin/addons/amxmodx/scripting");
+amxxpc.compile = function( version, src, done ){
+    var amxxpcPath = path.join(__dirname, "../../", "bin", "amxmodx-" + version, "addons/amxmodx/scripting");
     var sourcePath = path.resolve(src);
     var proc = spawn("./amxxpc", [ sourcePath ], { cwd: amxxpcPath });
     var errors = [];
@@ -32,7 +32,6 @@ amxxpc.compile = function( src, done ){
         {
             errors.push( new amxxpc.CompilationError("Compilation failed!") );
         }
-        
         
         console.log('' + data);
     });
