@@ -47,6 +47,11 @@ install.installVersion = function( version, next ){
             versionBinPath = path.join(binPath, "amxmodx-" + version);
             localTarball = path.join(versionBinPath, "amxmodx-" + version + ".archive");
         
+        if ( !fs.existsSync(binPath) )
+        {
+            fs.mkdirSync(binPath);
+        }
+        
         if ( fs.existsSync(versionBinPath) )
         {
             console.log("Package folder exists: " + clc.green(versionBinPath));
