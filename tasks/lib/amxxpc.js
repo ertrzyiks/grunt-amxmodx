@@ -1,5 +1,9 @@
 var path = require("path")
-    spawn = require('child_process').spawn;
+    fs = require("fs"),
+    spawn = require('child_process').spawn,
+    
+    config = require( path.join( __dirname, "../../", "config/config.js" ) ),
+    defaultVersion = config.getDefaultVersion();
 
 var amxxpc = module.exports = {};
 
@@ -19,12 +23,32 @@ amxxpc.CompilationWarning.prototype.toString = function(){
     return this.message;
 }
 
-amxxpc.compile = function( version, src, done ){
-    var amxxpcPath = path.join(__dirname, "../../", "bin", "amxmodx-" + version, "addons/amxmodx/scripting");
-    var sourcePath = path.resolve(src);
+/**
+ * 
+ */
+amxxpc.compile = function( src, options, done ){
+    var version = options.version || defaultVersion,
+        args = options.args || [],
+        amxxpcPath = path.join(__dirname, "../../", "bin", "amxmodx-" + version, "addons/amxmodx/scripting"),
+        sourcePath = path.resolve( src );
     
-    var proc = spawn("./amxxpc", [ sourcePath ], { cwd: amxxpcPath });
+    args.push( sourcePath );
+    
+    var proc = spawn("./amxxpc", args, { cwd: amxxpcPath });
     var errors = [];
+    
+    proc.on('error', function(err){
+        if ( err && err.code === 'ENOENT' )
+        {
+            if ( process.platform === 'linux' && ( -1 !== ["x64", "ia64"].indexOf(process.arch) ) )
+            {
+                console.log("You are trying to run 32bit executable on 64bit architecture.");
+                console.log("Check for compatibility packages for your system, like 'libc6-i386'");
+            }
+        }
+        
+        throw err;
+    });
         
     proc.stdout.on('data', function (data) {
         var output = data + '';

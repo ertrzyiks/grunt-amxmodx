@@ -25,25 +25,29 @@ module.exports = function(grunt) {
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['tmp']
+      tests: ['tmp', 'bin']
     },
 
     // Configuration to be run (and then tested).
     amxmodx: {
       default_options: {
         options: {
+            output: "tmp/"
         },
         files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
+            src: ['test/fixtures/testing.sma']
         }
       },
       custom_options: {
         options: {
-          separator: ': ',
-          punctuation: ' !!!'
+          versions: [
+            '1.8.1',
+            '1.8.2'
+          ],
+          output: "tmp/"
         },
         files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
+            src: ['test/fixtures/testing.sma']
         }
       }
     },

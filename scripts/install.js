@@ -3,34 +3,20 @@ var path = require("path"),
     clc = require("cli-color"),
     fs = require("fs"),
     spawn = require('child_process').spawn,
-    configPath = path.join(__dirname, "../", "config/versions.json"),
-    config = require(configPath),
-    versions = config.versions,
     
-    defaultVersion = config.defaultVersion;
+    config = require( path.join( __dirname, "../config/config.js" ) ),
+    versions = config.getVersions(),
+    defaultVersion = config.getDefaultVersion();
     
 var install = module.exports = {};
 
-install.getDefaultVersion = function(){
-    return defaultVersion;
-};
-
-install.getAvailableVersions = function(){
-    var vers = [], v;
-    for ( v in versions )
-    {
-        vers.push(v);
-    }
-    
-    return vers;
-};
-
-install.isVersionAvailable = function ( version ){
-    return "undefined" !== typeof(versions[version]);
+install.isInstalled = function ( version )
+{
+    return false;
 };
 
 install.installVersion = function( version, next ){
-    if ( "undefined" == typeof(versions[ version ]) )
+    if ( false === config.isVersionAvailable( version ) )
     {
         next( "Version '" + version + "' not found." );
         return;
@@ -40,7 +26,7 @@ install.installVersion = function( version, next ){
     
     function install( version, done )
     {
-        var versionConfig = versions[version],
+        var versionConfig = config.getVersion( version ),
             tarball = versionConfig.linux,
             
             binPath = path.join(__dirname, "../", "bin"),

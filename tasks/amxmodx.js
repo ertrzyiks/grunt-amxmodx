@@ -9,21 +9,25 @@
 'use strict';
 
 var async = require("async"),
+    path = require("path"),
+    fs = require("fs"),
     clc = require("cli-color"),
     install = require("../scripts/install.js"),
+    config = require("../config/config.js"),
     amxxpc = require("./lib/amxxpc.js");
 
 module.exports = function(grunt) {
     grunt.registerMultiTask('amxmodx', 'AMX mod X compiler task', function( ) {
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
-          versions: [ install.getDefaultVersion() ]
+            versions: [ config.getDefaultVersion() ],
+            output: "tmp/"
         });
     
         var cb = this.async();
         var files = this.files;
         
-        grunt.log.writeln('Processing task...');
+        grunt.log.writeln('Processing task...', options.versions);
 
         var calls = options.versions.map(function(version){
             return function(next){
@@ -31,18 +35,28 @@ module.exports = function(grunt) {
                 grunt.log.writeln("===================================");
                 grunt.log.writeln('Compile using version ' + clc.yellow.underline(version));
                 grunt.log.writeln("===================================");
+                              
+                function run()
+                {
+                    // Iterate over all specified file groups.
+                    async.each( files, compileFiles(version, options.output), next );
+                }  
                 
-                // Iterate over all specified file groups.
-                async.each( files, compileFiles(version), function(errors){
-                    onCompile(errors, next);
-                } );
+                if ( !install.isInstalled( version ) )
+                {
+                    install.installVersion( version, run );
+                }
+                else
+                {
+                    run();
+                }
             };
         });
     
         async.series(calls, cb);
     });
   
-    function compileFiles( version )
+    function compileFiles( version, outputDir )
     {
         return function(f, done){
             var src = f.src.filter(function(filepath) {
@@ -53,18 +67,34 @@ module.exports = function(grunt) {
             });
         
             async.each(src, function( filepath, next ){
-            
                 grunt.log.writeln( clc.green(filepath) );
-                amxxpc.compile( version, filepath, function(err){
+                
+                var outputPath = path.join( outputDir, "amxmodx-" + version ),
+                    outputAbsolutePath = path.resolve( outputPath ),
+                    output = outputAbsolutePath + "/plugin.amxx";
+                    
+                if ( !fs.existsSync( "tmp" ) )
+                {
+                    fs.mkdirSync( "tmp" );
+                }
+                if ( !fs.existsSync( outputAbsolutePath ) )
+                {
+                    
+                    fs.mkdirSync( outputAbsolutePath );
+                }
+                    
+                amxxpc.compile( filepath, { version: version, args: [  "-o" + output  ] } , function(err){
+                     console.log("Output:", output);
                      console.log("-------------------------------");
-                     next(err);
+                     
+                     onCompile(err, next);
                 } );
             }, function(err){
                 done(err);
             });
         };
     
-  }
+    }
   
     function onCompile( errors, cb )
     {
@@ -80,7 +110,7 @@ module.exports = function(grunt) {
                 }
             });
             
-            cb(errors)
+            cb(errors);
         }
         else
         {
