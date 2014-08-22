@@ -1,62 +1,60 @@
 var path = require("path"),
     http = require("http-request"),
     clc = require("cli-color"),
+    mkdirp = require("mkdirp"),
     fs = require("fs"),
     spawn = require('child_process').spawn,
     
-    config = require( path.join( __dirname, "../config/config.js" ) ),
+    config = require(path.join(__dirname, "../config/config.js")),
     versions = config.getVersions(),
     defaultVersion = config.getDefaultVersion();
     
 var install = module.exports = {};
 
-install.isInstalled = function ( version )
+install.isInstalled = function (version)
 {
-    return false;
+    var executablePath = config.getExecutablePath(version);
+    
+    if (!fs.existsSync(executablePath))
+    {
+        return false;
+    }
+    
+    return true;
 };
 
-install.installVersion = function( version, next ){
-    if ( false === config.isVersionAvailable( version ) )
+install.installVersion = function (version, next) {
+    if (false === config.isVersionAvailable(version))
     {
-        next( "Version '" + version + "' not found." );
+        next("Version '" + version + "' not found.");
         return;
     }
     
-    install( version, next );
-    
-    function install( version, done )
+    function doInstall(version, done)
     {
-        var versionConfig = config.getVersion( version ),
+        if (install.isInstalled(version))
+        {
+            done();
+            return;
+        }
+        
+        var versionConfig = config.getVersionData(version),
             tarball = versionConfig.linux,
             
-            binPath = path.join(__dirname, "../", "bin"),
-            versionBinPath = path.join(binPath, "amxmodx-" + version);
+            versionBinPath = config.getVersionBinPath(version),
             localTarball = path.join(versionBinPath, "amxmodx-" + version + ".archive");
         
-        if ( !fs.existsSync(binPath) )
-        {
-            fs.mkdirSync(binPath);
-        }
+        mkdirp.sync(versionBinPath);
         
-        if ( fs.existsSync(versionBinPath) )
-        {
-            console.log("Package folder exists: " + clc.green(versionBinPath));
-        }
-        else
-        {
-            console.log("Creating package folder: " + clc.green(versionBinPath));
-            fs.mkdirSync(versionBinPath);
-        }
-        
-        downloadFile(tarball, localTarball, function( err, filepath ){
-            if ( err )
+        downloadFile(tarball, localTarball, function (err, filepath) {
+            if (err)
             {
                 done(err);
                 return;
             }
             
-            extractFile(filepath, function(err){
-                if ( err )
+            extractFile(filepath, function (err) {
+                if (err)
                 {
                     done(err);
                     return;
@@ -68,9 +66,9 @@ install.installVersion = function( version, next ){
         });
     }
 
-    function extractFile( filepath, done )
+    function extractFile(filepath, done)
     {
-        console.log( "Extracting " + clc.green(filepath) );
+        console.log("Extracting " + clc.green(filepath));
         var folder = path.dirname(filepath);
         var filename = path.basename(filepath);
         var proc = spawn("tar", [ "-xvf", filename ], { cwd: folder });
@@ -84,8 +82,8 @@ install.installVersion = function( version, next ){
             error += data;
         });
 
-        proc.on('close', function (code) {     
-            if ( 0 !== code )
+        proc.on('close', function (code) {
+            if (0 !== code)
             {
                 console.log(error);
                 done("Tar return code " + code);
@@ -97,29 +95,32 @@ install.installVersion = function( version, next ){
         });
     }
 
-    function downloadFile( url, output, done )
+    function downloadFile(url, output, done)
     {
-        console.log("Downloading " + clc.green(url) );
+        console.log("Downloading " + clc.green(url));
         
         var progressPercent = 0;
         http.get(
             {
                 url: url,
                 progress: function (current, total) {
-                    var percent = Math.floor( current / total * 100 );
-                    if ( percent != progressPercent && percent % 10 == 0 )
+                    var percent = Math.floor(current / total * 100);
+                    
+                    if (percent !== progressPercent && percent % 10 === 0)
                     {
                         progressPercent = percent;
                         console.log('    downloaded ' + progressPercent + '%');
                     }
                    
                 }
-            }, 
-            output, 
-            function(err){
+            },
+            output,
+            function (err) {
                 done(err, output);
             }
         );
     }
+     
+    doInstall(version, next);
 };
     

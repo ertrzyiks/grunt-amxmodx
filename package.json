@@ -30,9 +30,10 @@
     "amxx-install": "./amxx-install.js"
   },
   "dependencies": {
-    "cli-color": "latest",
     "async": "latest",
-    "http-request": "latest"
+    "cli-color": "latest",
+    "http-request": "latest",
+    "mkdirp": "latest"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.9.2",

@@ -10,14 +10,15 @@
 
 var async = require("async"),
     path = require("path"),
+    mkdirp = require("mkdirp"),
     fs = require("fs"),
     clc = require("cli-color"),
     install = require("../scripts/install.js"),
     config = require("../config/config.js"),
     amxxpc = require("./lib/amxxpc.js");
 
-module.exports = function(grunt) {
-    grunt.registerMultiTask('amxmodx', 'AMX mod X compiler task', function( ) {
+module.exports = function (grunt) {
+    grunt.registerMultiTask('amxmodx', 'AMX mod X compiler task', function () {
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
             versions: [ config.getDefaultVersion() ],
@@ -29,8 +30,8 @@ module.exports = function(grunt) {
         
         grunt.log.writeln('Processing task...', options.versions);
 
-        var calls = options.versions.map(function(version){
-            return function(next){
+        var calls = options.versions.map(function (version) {
+            return function (next) {
             
                 grunt.log.writeln("===================================");
                 grunt.log.writeln('Compile using version ' + clc.yellow.underline(version));
@@ -39,12 +40,12 @@ module.exports = function(grunt) {
                 function run()
                 {
                     // Iterate over all specified file groups.
-                    async.each( files, compileFiles(version, options.output), next );
-                }  
+                    async.each(files, compileFiles(version, options.output), next);
+                }
                 
-                if ( !install.isInstalled( version ) )
+                if (!install.isInstalled(version))
                 {
-                    install.installVersion( version, run );
+                    install.installVersion(version, run);
                 }
                 else
                 {
@@ -56,51 +57,46 @@ module.exports = function(grunt) {
         async.series(calls, cb);
     });
   
-    function compileFiles( version, outputDir )
+    function compileFiles(version, outputDir)
     {
-        return function(f, done){
-            var src = f.src.filter(function(filepath) {
-                if (!grunt.file.exists(filepath)) {
+        return function (f, done) {
+            var src = f.src.filter(function (filepath) {
+                if (!grunt.file.exists(filepath))
+                {
                     throw new Error('Source file ' + clc.green(filepath) + ' not found.');
                 }
                 return true;
             });
         
-            async.each(src, function( filepath, next ){
-                grunt.log.writeln( clc.green(filepath) );
+            async.each(src, function (filepath, next) {
+                grunt.log.writeln(clc.green(filepath));
                 
-                var outputPath = path.join( outputDir, "amxmodx-" + version ),
-                    outputAbsolutePath = path.resolve( outputPath ),
-                    output = outputAbsolutePath + "/plugin.amxx";
+                var outputPath = path.join(outputDir, "amxmodx-" + version),
+                    outputAbsolutePath = path.resolve(outputPath),
+                    filename = path.basename(filepath, path.extname(filepath)),
+                    output = outputAbsolutePath + "/" + filename + ".amxx";
+                
+                mkdirp.sync(outputAbsolutePath);
                     
-                if ( !fs.existsSync( "tmp" ) )
-                {
-                    fs.mkdirSync( "tmp" );
-                }
-                if ( !fs.existsSync( outputAbsolutePath ) )
-                {
-                    
-                    fs.mkdirSync( outputAbsolutePath );
-                }
-                    
-                amxxpc.compile( filepath, { version: version, args: [  "-o" + output  ] } , function(err){
-                     console.log("Output:", output);
-                     console.log("-------------------------------");
+                amxxpc.compile(filepath, { version: version, args: [  "-o" + output  ] }, function (err) {
+                    console.log("Output:", output);
+                    console.log("-------------------------------");
                      
-                     onCompile(err, next);
-                } );
-            }, function(err){
+                    onCompile(err, next);
+                });
+            }, function (err) {
                 done(err);
             });
         };
     
     }
   
-    function onCompile( errors, cb )
+    function onCompile(errors, cb)
     {
-        if ( errors.length ){
-            errors.forEach(function(err){
-                if ( err instanceof amxxpc.CompilationWarning )
+        if (errors.length)
+        {
+            errors.forEach(function (err) {
+                if (err instanceof amxxpc.CompilationWarning)
                 {
                     grunt.log.warning(err);
                 }
