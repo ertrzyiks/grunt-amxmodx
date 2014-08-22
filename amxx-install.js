@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var install = require("./scripts/install.js"),
+    config = require("./config/config.js"),
     version = process.argv[2],
     
     path = require("path"),
@@ -24,7 +25,7 @@ catch(e)
 if ( "undefined" !== typeof(version) )
 {
     console.log("Installing version: " + clc.yellow.underline(version));
-   installVersion(version, onDone);
+    installVersion(version, onDone);
 }
 else if ( "undefined" !== typeof(pkg.amxmodx_versions) )
 {
@@ -40,7 +41,7 @@ else if ( "undefined" !== typeof(pkg.amxmodx_versions) )
 }
 else
 {
-    version = install.getDefaultVersion();
+    version = config.getDefaultVersion();
     console.log("Installing version: " + clc.yellow.underline(version) + clc.green("(default)"));
     
     installVersion(version, onDone);
@@ -48,11 +49,11 @@ else
 
 function installVersion(version, done)
 {
-    if ( false === install.isVersionAvailable( version ) )
+    if ( false === config.isVersionAvailable( version ) )
     {
         console.log("Version: " + clc.yellow.underline(version) + " not found. Available versions");
         
-        var versions = install.getAvailableVersions();
+        var versions = config.getAvailableVersions();
         
         for ( var i = 0; i < versions.length; i++)
         {

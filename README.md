@@ -1,4 +1,4 @@
-# grunt-amxmodx
+# grunt-amxmodx [![Build Status](https://travis-ci.org/ertrzyiks/grunt-amxmodx.svg?branch=master)](https://travis-ci.org/ertrzyiks/grunt-amxmodx)
 
 > AMX mod X compiler task
 
