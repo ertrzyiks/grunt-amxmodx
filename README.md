@@ -3,7 +3,7 @@
 > AMX mod X compiler task
 
 ## Getting Started
-This plugin requires Grunt `~0.4.5`
+This plugin requires Grunt `~0.4.5` and currently **works only on linux**.
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
@@ -58,6 +58,9 @@ and then use command
 ./node_modules/.bin/amxx-install
 ```
 
+####On demand
+If compiler is triggered with not installed version, installation will be done automatically just before compilation.
+
 ####Integration with travis
 Its required to install package `libc6-i386` in order to run 32bit amxx compiler on 64bit travis environment.
 
@@ -88,10 +91,16 @@ Default value: `[ '1.8.2' ]`
 
 Array of strings with version of AMX mod X to compile with.
 
+#### options.output
+Type: `string`
+Default value: `'tmp/'`
+
+Compilation output folder.
+
 ### Usage Examples
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+#### Custom versions Options
+In this example, compilation will be done with 1.8.1 and 1.8.2 version with the default output folder.
 
 package.json
 ```json
@@ -127,4 +136,4 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
+ * 2014-08-23   v0.1.0   Initial release
