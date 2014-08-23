@@ -97,6 +97,12 @@ Default value: `'tmp/'`
 
 Compilation output folder.
 
+#### options.includePath
+Type: `string`
+Default value: `null`
+
+Custom include path.
+
 ### Usage Examples
 
 #### Custom versions Options

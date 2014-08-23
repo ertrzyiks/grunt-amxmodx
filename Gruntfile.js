@@ -50,6 +50,14 @@ module.exports = function (grunt) {
                 files: {
                     src: ['test/fixtures/testing.sma']
                 }
+            },
+            custom_include_options: {
+                options: {
+                    includePath: "test/fixtures/include/"
+                },
+                files: {
+                    src: ['test/fixtures/custom_include.sma']
+                }
             }
         },
 

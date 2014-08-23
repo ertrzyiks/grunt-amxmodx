@@ -22,7 +22,8 @@ module.exports = function (grunt) {
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
             versions: [ config.getDefaultVersion() ],
-            output: "tmp/"
+            output: "tmp/",
+            includePath: null
         });
     
         var cb = this.async();
@@ -40,7 +41,7 @@ module.exports = function (grunt) {
                 function run()
                 {
                     // Iterate over all specified file groups.
-                    async.each(files, compileFiles(version, options.output), next);
+                    async.each(files, compileFiles(version, options), next);
                 }
                 
                 if (!install.isInstalled(version))
@@ -57,8 +58,11 @@ module.exports = function (grunt) {
         async.series(calls, cb);
     });
   
-    function compileFiles(version, outputDir)
+    function compileFiles(version, options)
     {
+        var outputDir = options.output,
+            includePath = options.includePath;
+            
         return function (f, done) {
             var src = f.src.filter(function (filepath) {
                 if (!grunt.file.exists(filepath))
@@ -77,8 +81,15 @@ module.exports = function (grunt) {
                     output = outputAbsolutePath + "/" + filename + ".amxx";
                 
                 mkdirp.sync(outputAbsolutePath);
+                
+                var args = [  "-o" + output  ];
+                
+                if (includePath)
+                {
+                    args.push("-i" + path.resolve(includePath));
+                }
                     
-                amxxpc.compile(filepath, { version: version, args: [  "-o" + output  ] }, function (err) {
+                amxxpc.compile(filepath, { version: version, args: args }, function (err) {
                     console.log("Output:", output);
                     console.log("-------------------------------");
                      
