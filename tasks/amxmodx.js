@@ -38,8 +38,13 @@ module.exports = function (grunt) {
                 grunt.log.writeln('Compile using version ' + clc.yellow.underline(version));
                 grunt.log.writeln("===================================");
                               
-                function run()
+                function run(err)
                 {
+                    if (err)
+                    {
+                        throw err;
+                    }
+                    
                     // Iterate over all specified file groups.
                     async.each(files, compileFiles(version, options), next);
                 }
