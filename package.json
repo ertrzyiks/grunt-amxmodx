@@ -32,7 +32,7 @@
   "dependencies": {
     "async": "latest",
     "cli-color": "latest",
-    "http-request": "latest",
+    "request": "latest",
     "mkdirp": "latest"
   },
   "devDependencies": {

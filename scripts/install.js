@@ -1,5 +1,5 @@
 var path = require("path"),
-    http = require("http-request"),
+    request = require("request"),
     clc = require("cli-color"),
     mkdirp = require("mkdirp"),
     fs = require("fs"),
@@ -94,31 +94,29 @@ install.installVersion = function (version, next) {
             done();
         });
     }
-
+    
+    var progressPercent = 0;
+    
+    function onProgress(current, total) {
+        var percent = Math.floor(current / total * 100);
+        
+        if (percent !== progressPercent && percent % 10 === 0)
+        {
+            progressPercent = percent;
+            console.log('    downloaded ' + progressPercent + '%');
+        }
+       
+    }
+    
     function downloadFile(url, output, done)
     {
         console.log("Downloading " + clc.green(url));
-        
-        var progressPercent = 0;
-        http.get(
-            {
-                url: url,
-                progress: function (current, total) {
-                    var percent = Math.floor(current / total * 100);
-                    
-                    if (percent !== progressPercent && percent % 10 === 0)
-                    {
-                        progressPercent = percent;
-                        console.log('    downloaded ' + progressPercent + '%');
-                    }
-                   
-                }
-            },
-            output,
-            function (err) {
-                done(err, output);
-            }
-        );
+          
+        var stream = request(url);
+        stream.pipe(fs.createWriteStream(output));
+        stream.on('end', function () {
+            done(null, output);
+        });
     }
      
     doInstall(version, next);
