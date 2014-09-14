@@ -1,7 +1,7 @@
 {
   "name": "grunt-amxmodx",
   "description": "AMX mod X compiler task",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/ertrzyiks/grunt-amxmodx",
   "author": {
     "name": "Mateusz Derks",
