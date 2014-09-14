@@ -17,6 +17,13 @@ module.exports = {
         return vers;
     },
     
+    getOs: function () {
+        var isWin = /^win/.test(process.platform),
+            os = isWin ? "win" : "linux";
+           
+        return os;
+    },
+    
     getDefaultVersion: function ()
     {
         return defaultVersion;
@@ -28,7 +35,11 @@ module.exports = {
         {
             throw new Error("Version " + version + " is not available");
         }
-        return versions[version];
+        
+        var versionData = versions[version],
+            os = this.getOs();
+        
+        return versionData[os];
     },
     
     getVersionBinPath: function (version)
@@ -41,7 +52,8 @@ module.exports = {
     
     getExecutablePath: function (version)
     {
-        return path.join(this.getVersionBinPath(version), "addons", "amxmodx", "scripting", "amxxpc");
+        var amxxpcFile = "win" === this.getOs() ? "amxxpc.exe" : "amxxpc";
+        return path.join(this.getVersionBinPath(version), "addons", "amxmodx", "scripting", amxxpcFile);
     },
     
     isVersionAvailable: function (version)

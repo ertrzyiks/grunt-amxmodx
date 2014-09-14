@@ -3,7 +3,7 @@
 > AMX mod X compiler task
 
 ## Getting Started
-This plugin requires Grunt `~0.4.5` and currently **works only on linux**.
+This plugin requires Grunt `~0.4.5` and **works only on linux and windows**.
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
@@ -142,4 +142,6 @@ grunt.initConfig({
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+ * 2014-08-23   v0.1.2   Added windows support
+ * 2014-08-23   v0.1.1   Added custom include path
  * 2014-08-23   v0.1.0   Initial release

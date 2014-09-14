@@ -1,7 +1,8 @@
 var path = require("path"),
-    http = require("http-request"),
+    request = require("request"),
     clc = require("cli-color"),
     mkdirp = require("mkdirp"),
+    unzip = require("unzip"),
     fs = require("fs"),
     spawn = require('child_process').spawn,
     
@@ -37,25 +38,20 @@ install.installVersion = function (version, next) {
             done();
             return;
         }
-        
-        var versionConfig = config.getVersionData(version),
-            tarball = versionConfig.linux,
-            
+        var tarball = config.getVersionData(version),
             versionBinPath = config.getVersionBinPath(version),
             localTarball = path.join(versionBinPath, "amxmodx-" + version + ".archive");
         
         mkdirp.sync(versionBinPath);
         
         downloadFile(tarball, localTarball, function (err, filepath) {
-            if (err)
-            {
+            if (err) {
                 done(err);
                 return;
             }
             
             extractFile(filepath, function (err) {
-                if (err)
-                {
+                if (err) {
                     done(err);
                     return;
                 }
@@ -69,10 +65,28 @@ install.installVersion = function (version, next) {
     function extractFile(filepath, done)
     {
         console.log("Extracting " + clc.green(filepath));
-        var folder = path.dirname(filepath);
-        var filename = path.basename(filepath);
-        var proc = spawn("tar", [ "-xvf", filename ], { cwd: folder });
-        var error = "";
+        
+        switch (config.getOs()) {
+            case 'linux':
+                extractTarFile(filepath, done);
+                break;
+            
+            case 'win':
+                extractZipFile(filepath, done);
+                break;
+                
+            default:
+                done(new Error("Os '" + config.getOs() + "' is not supported"));
+                break;
+        }
+        
+    }
+    
+    function extractTarFile(filepath, done) {
+        var folder = path.dirname(filepath),
+            filename = path.basename(filepath),
+            proc = spawn("tar", [ "-xvf", filename ], { cwd: folder }),
+            error = "";
             
         proc.stdout.on('data', function (data) {
             //console.log('' + data);
@@ -86,7 +100,7 @@ install.installVersion = function (version, next) {
             if (0 !== code)
             {
                 console.log(error);
-                done("Tar return code " + code);
+                done(new Error("Tar return code " + code));
                 return;
             }
             
@@ -94,31 +108,38 @@ install.installVersion = function (version, next) {
             done();
         });
     }
-
-    function downloadFile(url, output, done)
-    {
-        console.log("Downloading " + clc.green(url));
+    
+    function extractZipFile(filepath, done) {
+        fs
+            .createReadStream(filepath)
+            .pipe(unzip.Extract({ path: path.dirname(filepath) }))
+            .on('close', function () {
+                done();
+            });
+    }
+    
+    var progressPercent = 0;
+    
+    function onProgress(current, total) {
+        var percent = Math.floor(current / total * 100);
         
-        var progressPercent = 0;
-        http.get(
-            {
-                url: url,
-                progress: function (current, total) {
-                    var percent = Math.floor(current / total * 100);
-                    
-                    if (percent !== progressPercent && percent % 10 === 0)
-                    {
-                        progressPercent = percent;
-                        console.log('    downloaded ' + progressPercent + '%');
-                    }
-                   
-                }
-            },
-            output,
-            function (err) {
-                done(err, output);
-            }
-        );
+        if (percent !== progressPercent && percent % 10 === 0)
+        {
+            progressPercent = percent;
+            console.log('    downloaded ' + progressPercent + '%');
+        }
+       
+    }
+    
+    function downloadFile(url, output, done) {
+        console.log("Downloading " + clc.green(url));
+          
+        var stream = request(url);
+            
+        stream.pipe(fs.createWriteStream(output));
+        stream.on('end', function () {
+            done(null, output);
+        });
     }
      
     doInstall(version, next);
