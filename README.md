@@ -71,14 +71,13 @@ Add following lines to your before_scripts
   - sudo apt-get install libc6-i386
 ```
 
-Final travis.yml may looks like:
+Final .travis.yml may looks like:
 ```
+before_install: npm install -g grunt-cli
+install: npm install
 before_script:
   - sudo apt-get update
   - sudo apt-get install libc6-i386
-  - npm install
-  - npm install -g grunt-cli
-  - ./node_modules/.bin/amxx-install
 script:
   - grunt
 ```
