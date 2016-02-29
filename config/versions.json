@@ -2,8 +2,8 @@
     "defaultVersion": "1.8.2",
     "versions":{
         "1.8.2":{
-            "linux": "http://sourcemod.gameconnect.net/files/amxmodx-1.8.2-base-linux.tar.gz",
-            "win": "http://sourcemod.gameconnect.net/files/amxmodx-1.8.2-base-windows.zip"
+            "linux": "http://www.gsptalk.com/mirror/sourcemod/amxmodx-1.8.2-base-linux.tar.gz",
+            "win": "http://www.gsptalk.com/mirror/sourcemod/amxmodx-1.8.2-base-windows.zip"
         },
         
         "1.8.1": {
